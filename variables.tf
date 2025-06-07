@@ -49,68 +49,45 @@ type = string
 default = "t3.micro"
 }
 
-# Parámetros para la base de datos (RDS MySQL)
-# Referencia al secreto
-# Nombre de la base de datos de WordPress en RDS
-data "aws_secretsmanager_secret" "db_name" {
-  name = "/wordpress/db_name"
-}
+# # Parámetros para la base de datos (RDS MySQL)
+# variable "db_name" {
+# description = "Nombre de la base de datos de WordPress en RDS"
+# type = string
+# default = "wordpress"
+# }
+# variable "db_username" {
+# description = "Usuario administrador de la base de datos RDS"
+# type = string
+# default = "admin"
+# }
+# variable "db_password" {
+# description = "Contraseña del usuario de la base de datos RDS"
+# type = string
+# default = "PAssw0rd1234" # En entorno real, usar una contraseña segura y no hardcodeada
+# sensitive = true # Marcar como sensible para no mostrar en salida de Terraform
+# }
 
-data "aws_secretsmanager_secret_version" "db_name" {
-  secret_id = data.aws_secretsmanager_secret.db_name.id
-}
+# variable "DOMAIN_NAME" {
+#   type        = string
+#   description = "Dominio para la instalación de WordPress"
+#   default     = "wordpress-iac-tf.midemo.com"
+# }
 
-# Usuario administrador de la base de datos RDS
-data "aws_secretsmanager_secret" "db_username" {
-  name = "/wordpress/db_name"
-}
+# variable "DEMO_USERNAME" {
+#   type        = string
+#   description = "Usuario administrador para WordPress"
+#   default     = "wpadmin"
+# }
 
-data "aws_secretsmanager_secret_version" "db_username" {
-  secret_id = data.aws_secretsmanager_secret.db_username.id
-}
+# variable "DEMO_PASSWORD" {
+#   type        = string
+#   description = "Contraseña administrador para WordPress"
+#   default     = "wppassword123"
+#   sensitive = true # Marcar como sensible para no mostrar en salida de Terraform
+# }
 
-# Contraseña del usuario de la base de datos RDS
-data "aws_secretsmanager_secret" "db_password" {
-  name = "/wordpress/db_name"
-}
-
-data "aws_secretsmanager_secret_version" "db_password" {
-  secret_id = data.aws_secretsmanager_secret.db_password.id
-}
-
-# Dominio para la instalación de WordPress
-data "aws_secretsmanager_secret" "DOMAIN_NAME" {
-  name = "/wordpress/db_name"
-}
-
-data "aws_secretsmanager_secret_version" "DOMAIN_NAME" {
-  secret_id = data.aws_secretsmanager_secret.domain_name.id
-}
-
-# Usuario administrador para WordPress
-data "aws_secretsmanager_secret" "DEMO_USERNAME" {
-  name = "/wordpress/db_name"
-}
-
-data "aws_secretsmanager_secret_version" "DEMO_USERNAME" {
-  secret_id = data.aws_secretsmanager_secret.demo_username.id
-}
-
-# Contraseña administrador para WordPress
-data "aws_secretsmanager_secret" "DEMO_PASSWORD" {
-  name = "/wordpress/db_name"
-}
-
-data "aws_secretsmanager_secret_version" "DEMO_PASSWORD" {
-  secret_id = data.aws_secretsmanager_secret.demo_password.id
-}
-
-# Email administrador para WordPress
-data "aws_secretsmanager_secret" "DEMO_EMAIL" {
-  name = "/wordpress/db_name"
-}
-
-data "aws_secretsmanager_secret_version" "DEMO_EMAIL" {
-  secret_id = data.aws_secretsmanager_secret.demo_email.id
-}
-
+# variable "DEMO_EMAIL" {
+#   type        = string
+#   description = "Email administrador para WordPress"
+#   default     = "admin@midemo.com"
+# }
