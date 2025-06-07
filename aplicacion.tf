@@ -1,3 +1,16 @@
+# secrets
+data "aws_secretsmanager_secret" "wordpress" {
+  name = "wordpress"
+}
+
+data "aws_secretsmanager_secret_version" "wordpress" {
+  secret_id = data.aws_secretsmanager_secret.wordpress.id
+}
+
+locals {
+  wordpress_secrets = jsondecode(data.aws_secretsmanager_secret_version.wordpress.secret_string)
+}
+
 
 # Sistema de archivos EFS
 resource "aws_efs_file_system" "wordpress_fs" {
@@ -33,9 +46,9 @@ resource "aws_db_instance" "wordpress_db" {
   engine_version         = "8.0"
   instance_class         = "db.t3.micro"
   allocated_storage      = 20
-  db_name                = jsondecode(data.aws_secretsmanager_secret_version.db_name.secret_string)["db_name"]
-  username               = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["db_username"]
-  password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["db_password"] 
+  db_name                = local.wordpress_secrets["/wordpress/db_name"]
+  username               = local.wordpress_secrets["/wordpress/db_username"]
+  password               = local.wordpress_secrets["/wordpress/db_password"]
   db_subnet_group_name   = aws_db_subnet_group.rds_subnets.name
   vpc_security_group_ids = [aws_security_group.db_sg.id]
   publicly_accessible    = false
@@ -114,14 +127,14 @@ iam_instance_profile {
 user_data = base64encode(templatefile("${path.module}/userdata/staging-web.sh", {
   efs_id        = aws_efs_file_system.wordpress_fs.id
   region        = var.aws_region
-  db_name       = jsondecode(data.aws_secretsmanager_secret_version.db_name.secret_string)["db_name"]
-  db_username   = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["db_username"]
-  db_password   = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["db_password"]
+  db_name       = local.wordpress_secrets["/wordpress/db_name"]
+  db_username   = local.wordpress_secrets["/wordpress/db_username"]
+  db_password   = local.wordpress_secrets["/wordpress/db_password"]
   db_host       = aws_db_instance.wordpress_db.address
-  DOMAIN_NAME   = jsondecode(data.aws_secretsmanager_secret_version.domain_name.secret_string)["domain_name"]
-  DEMO_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.demo_username.secret_string)["demo_username"]
-  DEMO_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.depassowrd.secret_string)["demo_password"]
-  DEMO_EMAIL    = jsondecode(data.aws_secretsmanager_secret_version.demo_email.secret_string)["demo_email"]
+  DOMAIN_NAME   = local.wordpress_secrets["/wordpress/domain_name"]
+  DEMO_USERNAME = local.wordpress_secrets["/wordpress/demo_username"]
+  DEMO_PASSWORD = local.wordpress_secrets["/wordpress/demo_password"]
+  DEMO_EMAIL    = local.wordpress_secrets["/wordpress/demo_email"]
 }))
 tag_specifications {
 resource_type = "instance"
